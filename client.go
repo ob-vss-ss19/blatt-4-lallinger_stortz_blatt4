@@ -6,8 +6,8 @@ import (
 
 	"context"
 	"github.com/micro/cli"
-	proto "github.com/micro/examples/service/proto"
 	"github.com/micro/go-micro"
+	proto "vss/blatt4/blatt-4-lallinger_stortz_blatt4/proto"
 )
 
 /*
@@ -16,33 +16,38 @@ Example usage of top level service initialisation
 
 */
 
-type Greeter struct{}
+//type Greeter struct{}
 
-func (g *Greeter) Hello(ctx context.Context, req *proto.HelloRequest, rsp *proto.HelloResponse) error {
+type Cinema struct {}
+
+/*func (g *Greeter) Hello(ctx context.Context, req *proto.HelloRequest, rsp *proto.HelloResponse) error {
 	rsp.Greeting = "Hello " + req.Name
 	return nil
-}
+}*/
 
 // Setup and the client
 func runClient(service micro.Service) {
 	// Create new greeter client
-	greeter := proto.NewGreeterService("greeter", service.Client())
+	cine := proto.NewCinemaService("cinema", service.Client())
 
 	// Call the greeter
-	rsp, err := greeter.Hello(context.TODO(), &proto.HelloRequest{Name: "John"})
+	rsp, err := cine.Req(context.TODO(), &proto.CinemaRequest{Column: "Name", Value: "testKino"})
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// Print response
-	fmt.Println(rsp.Greeting)
+	for _, cd := range rsp.Data{
+		fmt.Printf("Name: %s, Rows: %d, RowLength:%d\n", cd.Name, cd.Rows, cd.RowLength)
+	}
+
 }
 
 func main() {
 	// Create a new service. Optionally include some options here.
 	service := micro.NewService(
-		micro.Name("greeter"),
+		micro.Name("cinema"),
 		micro.Version("latest"),
 		micro.Metadata(map[string]string{
 			"type": "helloworld",
@@ -65,22 +70,8 @@ func main() {
 		// Add runtime action
 		// We could actually do this above
 		micro.Action(func(c *cli.Context) {
-			if c.Bool("run_client") {
-				runClient(service)
-				os.Exit(0)
-			}
+			runClient(service)
+			os.Exit(0)
 		}),
 	)
-
-	// By default we'll run the server unless the flags catch us
-
-	// Setup the server
-
-	// Register handler
-	proto.RegisterGreeterHandler(service.Server(), new(Greeter))
-
-	// Run the server
-	if err := service.Run(); err != nil {
-		fmt.Println(err)
-	}
 }
