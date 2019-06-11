@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+service Greeter {
+	rpc Hello(HelloRequest) returns (HelloResponse) {}
+}
+
+message HelloRequest {
+	string name = 1;
+}
+
+message HelloResponse {
+	string greeting = 2;
+}
+
+
+service Cinema {
+    rpc Req(CinemaRequest) returns (CinemaResponse) {}
+}
+
+message CinemaRequest {
+    string column = 1;
+    string value = 2;
+}
+
+message CinemaData {
+    string name = 1;
+    int32 rows = 2;
+    int32 rowLength = 3;
+}
+
+message CinemaResponse {
+    repeated CinemaData data = 1;
+}
