@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
-	proto "vss/blatt4/blatt-4-lallinger_stortz_blatt4/proto"
+	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
 )
 
 type Showing struct{}

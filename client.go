@@ -7,7 +7,7 @@ import (
 	"context"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
-	proto "vss/blatt4/blatt-4-lallinger_stortz_blatt4/proto"
+	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
 )
 
 /*
@@ -18,7 +18,7 @@ Example usage of top level service initialisation
 
 //type Greeter struct{}
 
-type Cinema struct {}
+type Cinema struct{}
 
 /*func (g *Greeter) Hello(ctx context.Context, req *proto.HelloRequest, rsp *proto.HelloResponse) error {
 	rsp.Greeting = "Hello " + req.Name
@@ -38,7 +38,7 @@ func runClient(service micro.Service) {
 	}
 
 	// Print response
-	for _, cd := range rsp.Data{
+	for _, cd := range rsp.Data {
 		fmt.Printf("Name: %s, Rows: %d, RowLength:%d\n", cd.Name, cd.Rows, cd.RowLength)
 	}
 
