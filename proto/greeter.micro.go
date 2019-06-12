@@ -148,3 +148,239 @@ type cinemaHandler struct {
 func (h *cinemaHandler) Req(ctx context.Context, in *CinemaRequest, out *CinemaResponse) error {
 	return h.CinemaHandler.Req(ctx, in, out)
 }
+
+// Client API for Movie service
+
+type MovieService interface {
+	Req(ctx context.Context, in *MovieRequest, opts ...client.CallOption) (*MovieResponse, error)
+}
+
+type movieService struct {
+	c    client.Client
+	name string
+}
+
+func NewMovieService(name string, c client.Client) MovieService {
+	if c == nil {
+		c = client.NewClient()
+	}
+	if len(name) == 0 {
+		name = "movie"
+	}
+	return &movieService{
+		c:    c,
+		name: name,
+	}
+}
+
+func (c *movieService) Req(ctx context.Context, in *MovieRequest, opts ...client.CallOption) (*MovieResponse, error) {
+	req := c.c.NewRequest(c.name, "Movie.Req", in)
+	out := new(MovieResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for Movie service
+
+type MovieHandler interface {
+	Req(context.Context, *MovieRequest, *MovieResponse) error
+}
+
+func RegisterMovieHandler(s server.Server, hdlr MovieHandler, opts ...server.HandlerOption) error {
+	type movie interface {
+		Req(ctx context.Context, in *MovieRequest, out *MovieResponse) error
+	}
+	type Movie struct {
+		movie
+	}
+	h := &movieHandler{hdlr}
+	return s.Handle(s.NewHandler(&Movie{h}, opts...))
+}
+
+type movieHandler struct {
+	MovieHandler
+}
+
+func (h *movieHandler) Req(ctx context.Context, in *MovieRequest, out *MovieResponse) error {
+	return h.MovieHandler.Req(ctx, in, out)
+}
+
+// Client API for Reservation service
+
+type ReservationService interface {
+	Req(ctx context.Context, in *ReservationRequest, opts ...client.CallOption) (*ReservationResponse, error)
+}
+
+type reservationService struct {
+	c    client.Client
+	name string
+}
+
+func NewReservationService(name string, c client.Client) ReservationService {
+	if c == nil {
+		c = client.NewClient()
+	}
+	if len(name) == 0 {
+		name = "reservation"
+	}
+	return &reservationService{
+		c:    c,
+		name: name,
+	}
+}
+
+func (c *reservationService) Req(ctx context.Context, in *ReservationRequest, opts ...client.CallOption) (*ReservationResponse, error) {
+	req := c.c.NewRequest(c.name, "Reservation.Req", in)
+	out := new(ReservationResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for Reservation service
+
+type ReservationHandler interface {
+	Req(context.Context, *ReservationRequest, *ReservationResponse) error
+}
+
+func RegisterReservationHandler(s server.Server, hdlr ReservationHandler, opts ...server.HandlerOption) error {
+	type reservation interface {
+		Req(ctx context.Context, in *ReservationRequest, out *ReservationResponse) error
+	}
+	type Reservation struct {
+		reservation
+	}
+	h := &reservationHandler{hdlr}
+	return s.Handle(s.NewHandler(&Reservation{h}, opts...))
+}
+
+type reservationHandler struct {
+	ReservationHandler
+}
+
+func (h *reservationHandler) Req(ctx context.Context, in *ReservationRequest, out *ReservationResponse) error {
+	return h.ReservationHandler.Req(ctx, in, out)
+}
+
+// Client API for Showing service
+
+type ShowingService interface {
+	Req(ctx context.Context, in *ShowingRequest, opts ...client.CallOption) (*ShowingResponse, error)
+}
+
+type showingService struct {
+	c    client.Client
+	name string
+}
+
+func NewShowingService(name string, c client.Client) ShowingService {
+	if c == nil {
+		c = client.NewClient()
+	}
+	if len(name) == 0 {
+		name = "showing"
+	}
+	return &showingService{
+		c:    c,
+		name: name,
+	}
+}
+
+func (c *showingService) Req(ctx context.Context, in *ShowingRequest, opts ...client.CallOption) (*ShowingResponse, error) {
+	req := c.c.NewRequest(c.name, "Showing.Req", in)
+	out := new(ShowingResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for Showing service
+
+type ShowingHandler interface {
+	Req(context.Context, *ShowingRequest, *ShowingResponse) error
+}
+
+func RegisterShowingHandler(s server.Server, hdlr ShowingHandler, opts ...server.HandlerOption) error {
+	type showing interface {
+		Req(ctx context.Context, in *ShowingRequest, out *ShowingResponse) error
+	}
+	type Showing struct {
+		showing
+	}
+	h := &showingHandler{hdlr}
+	return s.Handle(s.NewHandler(&Showing{h}, opts...))
+}
+
+type showingHandler struct {
+	ShowingHandler
+}
+
+func (h *showingHandler) Req(ctx context.Context, in *ShowingRequest, out *ShowingResponse) error {
+	return h.ShowingHandler.Req(ctx, in, out)
+}
+
+// Client API for User service
+
+type UserService interface {
+	Req(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error)
+}
+
+type userService struct {
+	c    client.Client
+	name string
+}
+
+func NewUserService(name string, c client.Client) UserService {
+	if c == nil {
+		c = client.NewClient()
+	}
+	if len(name) == 0 {
+		name = "user"
+	}
+	return &userService{
+		c:    c,
+		name: name,
+	}
+}
+
+func (c *userService) Req(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.Req", in)
+	out := new(UserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for User service
+
+type UserHandler interface {
+	Req(context.Context, *UserRequest, *UserResponse) error
+}
+
+func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
+	type user interface {
+		Req(ctx context.Context, in *UserRequest, out *UserResponse) error
+	}
+	type User struct {
+		user
+	}
+	h := &userHandler{hdlr}
+	return s.Handle(s.NewHandler(&User{h}, opts...))
+}
+
+type userHandler struct {
+	UserHandler
+}
+
+func (h *userHandler) Req(ctx context.Context, in *UserRequest, out *UserResponse) error {
+	return h.UserHandler.Req(ctx, in, out)
+}
