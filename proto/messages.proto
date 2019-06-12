@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 service Cinema {
-    rpc Req(CinemaRequest) returns (CinemaResponse) {}
+    rpc Request(CinemaRequest) returns (CinemaResponse) {}
 }
 
 message CinemaRequest {
@@ -20,7 +20,7 @@ message CinemaResponse {
 }
 
 service Movie {
-    rpc Req(MovieRequest) returns (MovieResponse) {}
+    rpc Request(MovieRequest) returns (MovieResponse) {}
 }
 
 message MovieRequest {
@@ -37,7 +37,7 @@ message MovieResponse {
 }
 
 service Reservation {
-    rpc Req(ReservationRequest) returns (ReservationResponse) {}
+    rpc Request(ReservationRequest) returns (ReservationResponse) {}
 }
 
 message ReservationRequest {
@@ -54,7 +54,7 @@ message ReservationResponse {
 }
 
 service Showing {
-    rpc Req(ShowingRequest) returns (ShowingResponse) {}
+    rpc Request(ShowingRequest) returns (ShowingResponse) {}
 }
 
 message ShowingRequest {
@@ -71,7 +71,7 @@ message ShowingResponse {
 }
 
 service User {
-    rpc Req(UserRequest) returns (UserResponse) {}
+    rpc Request(UserRequest) returns (UserResponse) {}
 }
 
 message UserRequest {
