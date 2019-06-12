@@ -17,7 +17,7 @@ func (Reservation) Req(context.Context, *proto.ReservationRequest, *proto.Reserv
 func main() {
 	// Create a new service. Optionally include some options here.
 	service := micro.NewService(
-		micro.Name("movie"),
+		micro.Name("reservation"),
 		micro.Version("latest"),
 	)
 

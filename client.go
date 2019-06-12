@@ -47,11 +47,8 @@ func runClient(service micro.Service) {
 func main() {
 	// Create a new service. Optionally include some options here.
 	service := micro.NewService(
-		micro.Name("cinema"),
+		micro.Name("client"),
 		micro.Version("latest"),
-		micro.Metadata(map[string]string{
-			"type": "helloworld",
-		}),
 
 		// Setup some flags. Specify --run_client to run the client
 
