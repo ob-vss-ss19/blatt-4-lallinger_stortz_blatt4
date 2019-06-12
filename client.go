@@ -13,14 +13,27 @@ func main() {
 	cine := proto.NewCinemaService("cinema", service.Client())
 
 	// Call
-	rsp, err := cine.Request(context.TODO(), &proto.CinemaRequest{Column: "Name", Value: "testKino"})
+	rsp, err := cine.AddCinema(context.TODO(), &proto.CinemaData{Name: "Kino2", Rows: 11, RowLength: 13})
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// Print response
-	for _, cd := range rsp.Data {
-		fmt.Printf("Name: %s, Rows: %d, RowLength:%d\n", cd.Name, cd.Rows, cd.RowLength)
+	if rsp.Success {
+		fmt.Println("Success!")
+	} else {
+		fmt.Println("Error")
+	}
+	fmt.Printf("%s\n", rsp.Message)
+
+	resp, err := cine.GetCinemas(context.TODO(), &proto.CinemaRequest{})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, v := range resp.Data {
+		fmt.Printf("Cinema: %s. Rows: %d. Rowlength: %d\n", v.Name, v.Rows, v.RowLength)
 	}
 }

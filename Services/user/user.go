@@ -7,10 +7,18 @@ import (
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
 )
 
-type User struct{}
+type User struct {
+	users map[string][]int
+}
 
-func (User) Request(context.Context, *proto.UserRequest, *proto.UserResponse) error {
-	panic("implement me")
+func (me *User) CreateUser(ctx context.Context, req *proto.UserData, rsp *proto.Response) error {
+	return nil
+}
+func (me *User) DeleteUser(ctx context.Context, req *proto.UserData, rsp *proto.Response) error {
+	return nil
+}
+func (me *User) GetUsers(ctx context.Context, req *proto.UserRequest, rsp *proto.UserResponse) error {
+	return nil
 }
 
 func main() {

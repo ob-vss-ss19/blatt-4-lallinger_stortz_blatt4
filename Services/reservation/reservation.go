@@ -7,10 +7,28 @@ import (
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
 )
 
-type Reservation struct{}
+type reservationData struct {
+	user    string
+	showing int
+	seats   int
+	booked  bool
+}
 
-func (Reservation) Request(context.Context, *proto.ReservationRequest, *proto.ReservationResponse) error {
-	panic("implement me")
+type Reservation struct {
+	reservations map[int][]reservationData
+}
+
+func (me *Reservation) RequestReservation(ctx context.Context, req *proto.ReservationData, rsp *proto.ReservationData) error {
+	return nil
+}
+func (me *Reservation) BookReservation(ctx context.Context, req *proto.ReservationData, rsp *proto.Response) error {
+	return nil
+}
+func (me *Reservation) DeleteReservation(ctx context.Context, req *proto.ReservationData, rsp *proto.Response) error {
+	return nil
+}
+func (me *Reservation) GetReservations(ctx context.Context, req *proto.ReservationRequest, rsp *proto.ReservationResponse) error {
+	return nil
 }
 
 func main() {

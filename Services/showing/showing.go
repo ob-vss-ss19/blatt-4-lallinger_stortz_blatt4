@@ -7,10 +7,23 @@ import (
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
 )
 
-type Showing struct{}
+type showingData struct {
+	movie  string
+	cinema string
+}
 
-func (Showing) Request(context.Context, *proto.ShowingRequest, *proto.ShowingResponse) error {
-	panic("implement me")
+type Showing struct {
+	showings map[int][]showingData
+}
+
+func (me *Showing) AddShowing(ctx context.Context, req *proto.ShowingData, rsp *proto.Response) error {
+	return nil
+}
+func (me *Showing) DeleteShowing(ctx context.Context, req *proto.ShowingData, rsp *proto.Response) error {
+	return nil
+}
+func (me *Showing) GetShowings(ctx context.Context, req *proto.ShowingRequest, rsp *proto.ShowingResponse) error {
+	return nil
 }
 
 func main() {
