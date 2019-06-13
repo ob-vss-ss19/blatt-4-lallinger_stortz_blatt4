@@ -17,6 +17,28 @@ type Cinema struct {
 	cinemas map[string]*cinemaData
 }
 
+func deleteShowings(cinema string) {
+	service := micro.NewService(micro.Name("cinemaRequest"))
+	service.Init()
+	show := proto.NewShowingService("showing", service.Client())
+
+	rsp, err := show.GetShowings(context.TODO(), &proto.ShowingRequest{})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, v := range rsp.Data {
+		if v.Cinema == cinema {
+			resp, err := show.DeleteShowing(context.TODO(), &proto.ShowingData{Id: v.Id})
+			if err != nil || !resp.Success {
+				fmt.Println(err)
+				return
+			}
+		}
+	}
+}
+
 func (me *Cinema) AddCinema(ctx context.Context, req *proto.CinemaData, rsp *proto.Response) error {
 	if me.cinemas == nil {
 		me.cinemas = make(map[string]*cinemaData)
@@ -39,6 +61,7 @@ func (me *Cinema) DeleteCinema(ctx context.Context, req *proto.CinemaData, rsp *
 		return nil
 	}
 
+	deleteShowings(req.Name)
 	delete(me.cinemas, req.Name)
 	rsp.Success = true
 	rsp.Message = fmt.Sprintf("Deleted cinema %s", req.Name)

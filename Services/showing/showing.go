@@ -14,10 +14,32 @@ type showingData struct {
 
 type Showing struct {
 	showings map[int32]*showingData
-	nextID int32
+	nextID   int32
 }
 
-func movieExists(title string) bool{
+func deleteReservations(showing int32) {
+	service := micro.NewService(micro.Name("showingRequest"))
+	service.Init()
+	reservation := proto.NewReservationService("reservation", service.Client())
+
+	rsp, err := reservation.GetReservations(context.TODO(), &proto.ReservationRequest{})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, v := range rsp.Data {
+		if v.Showing == showing {
+			resp, err := reservation.DeleteReservation(context.TODO(), &proto.ReservationData{ReservationID: v.ReservationID})
+			if err != nil || !resp.Success {
+				fmt.Println(err)
+				return
+			}
+		}
+	}
+}
+
+func movieExists(title string) bool {
 	service := micro.NewService(micro.Name("showingRequest"))
 	service.Init()
 	mov := proto.NewMovieService("movie", service.Client())
@@ -37,7 +59,7 @@ func movieExists(title string) bool{
 	return false
 }
 
-func cinemaExists(name string) bool{
+func cinemaExists(name string) bool {
 	service := micro.NewService(micro.Name("showingRequest"))
 	service.Init()
 	cine := proto.NewCinemaService("cinema", service.Client())
@@ -58,24 +80,24 @@ func cinemaExists(name string) bool{
 }
 
 func (me *Showing) AddShowing(ctx context.Context, req *proto.ShowingData, rsp *proto.Response) error {
-	if me.showings==nil {
-		me.showings=make(map[int32]*showingData)
-		me.nextID=0
+	if me.showings == nil {
+		me.showings = make(map[int32]*showingData)
+		me.nextID = 0
 	}
 	if !movieExists(req.Movie) {
-		rsp.Success=false
-		rsp.Message=fmt.Sprintf("Movie %s does not exist.",req.Movie)
+		rsp.Success = false
+		rsp.Message = fmt.Sprintf("Movie %s does not exist.", req.Movie)
 		return nil
 	}
 	if !cinemaExists(req.Cinema) {
-		rsp.Success=false
-		rsp.Message=fmt.Sprintf("Cinema %s does not exist.",req.Cinema)
+		rsp.Success = false
+		rsp.Message = fmt.Sprintf("Cinema %s does not exist.", req.Cinema)
 		return nil
 	}
 
-	me.showings[me.nextID]= &showingData{cinema:req.Cinema,movie:req.Movie}
-	rsp.Success=true
-	rsp.Message=fmt.Sprintf("Added showing %d for %s in %s.",me.nextID,req.Movie,req.Cinema)
+	me.showings[me.nextID] = &showingData{cinema: req.Cinema, movie: req.Movie}
+	rsp.Success = true
+	rsp.Message = fmt.Sprintf("Added showing %d for %s in %s.", me.nextID, req.Movie, req.Cinema)
 	me.nextID++
 	return nil
 }
@@ -85,14 +107,16 @@ func (me *Showing) DeleteShowing(ctx context.Context, req *proto.ShowingData, rs
 		rsp.Message = fmt.Sprintf("Showing ID %d does not exist.", req.Id)
 		return nil
 	}
+
+	deleteReservations(req.Id)
 	delete(me.showings, req.Id)
-	rsp.Success=true
-	rsp.Message=fmt.Sprintf("Deleted showing %d.",req.Id)
+	rsp.Success = true
+	rsp.Message = fmt.Sprintf("Deleted showing %d.", req.Id)
 	return nil
 }
 func (me *Showing) GetShowings(ctx context.Context, req *proto.ShowingRequest, rsp *proto.ShowingResponse) error {
 	for k, v := range me.showings {
-		rsp.Data= append(rsp.Data, &proto.ShowingData{Id:k,Cinema:v.cinema,Movie:v.movie})
+		rsp.Data = append(rsp.Data, &proto.ShowingData{Id: k, Cinema: v.cinema, Movie: v.movie})
 	}
 	return nil
 }
