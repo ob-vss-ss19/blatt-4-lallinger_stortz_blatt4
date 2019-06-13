@@ -220,7 +220,7 @@ func (h *movieHandler) GetMovies(ctx context.Context, in *MovieRequest, out *Mov
 // Client API for Reservation service
 
 type ReservationService interface {
-	RequestReservation(ctx context.Context, in *ReservationData, opts ...client.CallOption) (*ReservationData, error)
+	RequestReservation(ctx context.Context, in *ReservationData, opts ...client.CallOption) (*Response, error)
 	BookReservation(ctx context.Context, in *ReservationData, opts ...client.CallOption) (*Response, error)
 	DeleteReservation(ctx context.Context, in *ReservationData, opts ...client.CallOption) (*Response, error)
 	GetReservations(ctx context.Context, in *ReservationRequest, opts ...client.CallOption) (*ReservationResponse, error)
@@ -244,9 +244,9 @@ func NewReservationService(name string, c client.Client) ReservationService {
 	}
 }
 
-func (c *reservationService) RequestReservation(ctx context.Context, in *ReservationData, opts ...client.CallOption) (*ReservationData, error) {
+func (c *reservationService) RequestReservation(ctx context.Context, in *ReservationData, opts ...client.CallOption) (*Response, error) {
 	req := c.c.NewRequest(c.name, "Reservation.RequestReservation", in)
-	out := new(ReservationData)
+	out := new(Response)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -287,7 +287,7 @@ func (c *reservationService) GetReservations(ctx context.Context, in *Reservatio
 // Server API for Reservation service
 
 type ReservationHandler interface {
-	RequestReservation(context.Context, *ReservationData, *ReservationData) error
+	RequestReservation(context.Context, *ReservationData, *Response) error
 	BookReservation(context.Context, *ReservationData, *Response) error
 	DeleteReservation(context.Context, *ReservationData, *Response) error
 	GetReservations(context.Context, *ReservationRequest, *ReservationResponse) error
@@ -295,7 +295,7 @@ type ReservationHandler interface {
 
 func RegisterReservationHandler(s server.Server, hdlr ReservationHandler, opts ...server.HandlerOption) error {
 	type reservation interface {
-		RequestReservation(ctx context.Context, in *ReservationData, out *ReservationData) error
+		RequestReservation(ctx context.Context, in *ReservationData, out *Response) error
 		BookReservation(ctx context.Context, in *ReservationData, out *Response) error
 		DeleteReservation(ctx context.Context, in *ReservationData, out *Response) error
 		GetReservations(ctx context.Context, in *ReservationRequest, out *ReservationResponse) error
@@ -311,7 +311,7 @@ type reservationHandler struct {
 	ReservationHandler
 }
 
-func (h *reservationHandler) RequestReservation(ctx context.Context, in *ReservationData, out *ReservationData) error {
+func (h *reservationHandler) RequestReservation(ctx context.Context, in *ReservationData, out *Response) error {
 	return h.ReservationHandler.RequestReservation(ctx, in, out)
 }
 

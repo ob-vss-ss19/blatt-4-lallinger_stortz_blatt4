@@ -11,14 +11,59 @@ func main() {
 	service := micro.NewService(micro.Name("client"))
 	service.Init()
 	cine := proto.NewCinemaService("cinema", service.Client())
+	movie:= proto.NewMovieService("movie",service.Client())
+	reservation:= proto.NewReservationService("reservation",service.Client())
+	showing:=proto.NewShowingService("showing",service.Client())
+	user:=proto.NewUserService("user",service.Client())
 
 	// Call
-	rsp, err := cine.AddCinema(context.TODO(), &proto.CinemaData{Name: "Kino2", Rows: 11, RowLength: 13})
+	rsp, err := cine.AddCinema(context.TODO(), &proto.CinemaData{Name: "Kino2", Rows: 5, RowLength: 5})
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	printResponse(rsp)
 
+	rsp, err = movie.AddMovie(context.TODO(),&proto.MovieData{Title:"firstmovie"})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	printResponse(rsp)
+
+	rsp, err = showing.AddShowing(context.TODO(),&proto.ShowingData{Movie:"firstmovie",Cinema:"Kino2"})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	printResponse(rsp)
+
+	rsp, err = user.CreateUser(context.TODO(),&proto.UserData{Name:"sepp"})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	printResponse(rsp)
+
+
+	rsp, err = reservation.RequestReservation(context.TODO(),&proto.ReservationData{User:"sepp",Showing:0,Seats:26})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	printResponse(rsp)
+
+	rsp, err = reservation.BookReservation(context.TODO(),&proto.ReservationData{ReservationID:0})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	printResponse(rsp)
+
+
+}
+
+func printResponse(rsp *proto.Response){
 	// Print response
 	if rsp.Success {
 		fmt.Println("Success!")
@@ -26,14 +71,4 @@ func main() {
 		fmt.Println("Error")
 	}
 	fmt.Printf("%s\n", rsp.Message)
-
-	resp, err := cine.GetCinemas(context.TODO(), &proto.CinemaRequest{})
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	for _, v := range resp.Data {
-		fmt.Printf("Cinema: %s. Rows: %d. Rowlength: %d\n", v.Name, v.Rows, v.RowLength)
-	}
 }
