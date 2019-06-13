@@ -3,36 +3,32 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/micro/cli"
 	"github.com/micro/go-micro"
-	proto "vss/blatt4/blatt-4-lallinger_stortz_blatt4/proto"
+	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
 )
 
-type Showing struct{}
+type showingData struct {
+	movie  string
+	cinema string
+}
 
-func (Showing) Req(context.Context, *proto.ShowingRequest, *proto.ShowingResponse) error {
-	panic("implement me")
+type Showing struct {
+	showings map[int][]showingData
+}
+
+func (me *Showing) AddShowing(ctx context.Context, req *proto.ShowingData, rsp *proto.Response) error {
+	return nil
+}
+func (me *Showing) DeleteShowing(ctx context.Context, req *proto.ShowingData, rsp *proto.Response) error {
+	return nil
+}
+func (me *Showing) GetShowings(ctx context.Context, req *proto.ShowingRequest, rsp *proto.ShowingResponse) error {
+	return nil
 }
 
 func main() {
-	// Create a new service. Optionally include some options here.
-	service := micro.NewService(
-		micro.Name("showing"),
-		micro.Version("latest"),
-	)
-
-	// Init will parse the command line flags. Any flags set will
-	// override the above settings. Options defined here will
-	// override anything set on the command line.
-	service.Init(
-		// Add runtime action
-		// We could actually do this above
-		micro.Action(func(c *cli.Context) {
-
-		}),
-	)
-	// Setup the server
-	// Register handler
+	service := micro.NewService(micro.Name("showing"))
+	service.Init()
 	proto.RegisterShowingHandler(service.Server(), new(Showing))
 
 	// Run the server
