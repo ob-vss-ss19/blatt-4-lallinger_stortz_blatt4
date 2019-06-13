@@ -35,7 +35,7 @@ message MovieResponse {
 }
 
 service Reservation {
-    rpc RequestReservation(ReservationData) returns (ReservationData) {}
+    rpc RequestReservation(ReservationData) returns (Response) {}
     rpc BookReservation(ReservationData) returns (Response) {}
     rpc DeleteReservation(ReservationData) returns (Response) {}
     rpc GetReservations(ReservationRequest) returns (ReservationResponse) {}
@@ -46,8 +46,9 @@ message ReservationRequest {}
 message ReservationData{
     int32 reservationID=1;
     int32 showing=2;
-    string user=3;
-    int32 seats=4;
+    int32 seats=3;
+    bool booked=4;
+    string user=5;
 }
 
 message ReservationResponse {
