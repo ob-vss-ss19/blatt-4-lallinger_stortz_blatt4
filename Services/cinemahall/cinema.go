@@ -14,12 +14,12 @@ type cinemaData struct {
 }
 
 type Cinema struct {
-	cinemas map[string]cinemaData
+	cinemas map[string]*cinemaData
 }
 
 func (me *Cinema) AddCinema(ctx context.Context, req *proto.CinemaData, rsp *proto.Response) error {
 	if me.cinemas == nil {
-		me.cinemas = make(map[string]cinemaData)
+		me.cinemas = make(map[string]*cinemaData)
 	}
 	if _, ok := me.cinemas[req.Name]; ok {
 		rsp.Success = false
@@ -27,7 +27,7 @@ func (me *Cinema) AddCinema(ctx context.Context, req *proto.CinemaData, rsp *pro
 		return nil
 	}
 
-	me.cinemas[req.Name] = cinemaData{RowLength: req.RowLength, Rows: req.Rows}
+	me.cinemas[req.Name] = &cinemaData{RowLength: req.RowLength, Rows: req.Rows}
 	rsp.Success = true
 	rsp.Message = fmt.Sprintf("Added %s to cinemas.", req.Name)
 	return nil
