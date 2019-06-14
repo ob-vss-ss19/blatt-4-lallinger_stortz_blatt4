@@ -1,16 +1,3 @@
 del client.exe
 cd Services
-cd cinemahall
-del cinemahall.exe
-cd ..
-cd movie
-del movie.exe
-cd ..
-cd reservation
-del reservation.exe
-cd ..
-cd showing
-del showing.exe
-cd ..
-cd user
-del user.exe
+del services.exe

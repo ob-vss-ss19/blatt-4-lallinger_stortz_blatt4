@@ -1,10 +1,13 @@
-package main
+package showing
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/client"
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
+	"math/big"
 )
 
 type showingData struct {
@@ -18,11 +21,10 @@ type Showing struct {
 }
 
 func deleteReservations(showing int32) {
-	service := micro.NewService(micro.Name("showingRequest"))
-	service.Init()
-	reservation := proto.NewReservationService("reservation", service.Client())
+	var client client.Client
+	reservation := proto.NewReservationService("reservation", client)
 
-	rsp, err := reservation.GetReservations(context.TODO(), &proto.ReservationRequest{})
+	rsp, err := reservation.GetReservations(context.TODO(), &proto.Request{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -40,12 +42,11 @@ func deleteReservations(showing int32) {
 }
 
 func movieExists(title string) bool {
-	service := micro.NewService(micro.Name("showingRequest"))
-	service.Init()
-	mov := proto.NewMovieService("movie", service.Client())
+	var client client.Client
+	mov := proto.NewMovieService("movie", client)
 
 	// Call
-	rsp, err := mov.GetMovies(context.TODO(), &proto.MovieRequest{})
+	rsp, err := mov.GetMovies(context.TODO(), &proto.Request{})
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -60,12 +61,11 @@ func movieExists(title string) bool {
 }
 
 func cinemaExists(name string) bool {
-	service := micro.NewService(micro.Name("showingRequest"))
-	service.Init()
-	cine := proto.NewCinemaService("cinema", service.Client())
+	var client client.Client
+	cine := proto.NewCinemaService("cinema", client)
 
 	// Call
-	rsp, err := cine.GetCinemas(context.TODO(), &proto.CinemaRequest{})
+	rsp, err := cine.GetCinemas(context.TODO(), &proto.Request{})
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -114,18 +114,34 @@ func (me *Showing) DeleteShowing(ctx context.Context, req *proto.ShowingData, rs
 	rsp.Message = fmt.Sprintf("Deleted showing %d.", req.Id)
 	return nil
 }
-func (me *Showing) GetShowings(ctx context.Context, req *proto.ShowingRequest, rsp *proto.ShowingResponse) error {
+func (me *Showing) GetShowings(ctx context.Context, req *proto.Request, rsp *proto.ShowingResponse) error {
 	for k, v := range me.showings {
 		rsp.Data = append(rsp.Data, &proto.ShowingData{Id: k, Cinema: v.cinema, Movie: v.movie})
 	}
 	return nil
 }
 
-func main() {
-	service := micro.NewService(micro.Name("showing"))
-	service.Init()
+func StartShowingService(ctx context.Context, test bool){
+	var port int64
+	port = 0
+	if test {
+		reader := rand.Reader
+		rsp, _ := rand.Int(reader, big.NewInt(1000))
+		port = 1024 + 4 + rsp.Int64()
+	}
+
+	service := micro.NewService(
+		micro.Name("showing"),
+		micro.Address(fmt.Sprintf(":%v", port)),
+		micro.Context(ctx),
+	)
+
+	if !test {
+		service.Init()
+	}
 	proto.RegisterShowingHandler(service.Server(), new(Showing))
 
+	fmt.Println("Starting showing service")
 	// Run the server
 	if err := service.Run(); err != nil {
 		fmt.Println(err)

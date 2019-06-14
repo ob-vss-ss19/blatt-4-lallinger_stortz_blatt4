@@ -77,7 +77,7 @@ func main() {
 		case "delete":
 			printResponse(cine.DeleteCinema(context.TODO(), &proto.CinemaData{Name: flag.Arg(2)}))
 		case "get":
-			printCinemas(cine.GetCinemas(context.TODO(), &proto.CinemaRequest{}))
+			printCinemas(cine.GetCinemas(context.TODO(), &proto.Request{}))
 		}
 	case "movie":
 		movie = proto.NewMovieService("movie", service.Client())
@@ -87,7 +87,7 @@ func main() {
 		case "delete":
 			printResponse(movie.DeleteMovie(context.TODO(), &proto.MovieData{Title: flag.Arg(2)}))
 		case "get":
-			printMovies(movie.GetMovies(context.TODO(), &proto.MovieRequest{}))
+			printMovies(movie.GetMovies(context.TODO(), &proto.Request{}))
 		}
 	case "reservation":
 		reservation = proto.NewReservationService("reservation", service.Client())
@@ -99,7 +99,7 @@ func main() {
 		case "delete":
 			printResponse(reservation.DeleteReservation(context.TODO(), &proto.ReservationData{ReservationID: toInt32(flag.Arg(2))}))
 		case "get":
-			printReservations(reservation.GetReservations(context.TODO(), &proto.ReservationRequest{}))
+			printReservations(reservation.GetReservations(context.TODO(), &proto.Request{}))
 		}
 	case "showing":
 		showing = proto.NewShowingService("showing", service.Client())
@@ -109,7 +109,7 @@ func main() {
 		case "delete":
 			printResponse(showing.DeleteShowing(context.TODO(), &proto.ShowingData{Id: toInt32(flag.Arg(2))}))
 		case "get":
-			printShowings(showing.GetShowings(context.TODO(), &proto.ShowingRequest{}))
+			printShowings(showing.GetShowings(context.TODO(), &proto.Request{}))
 		}
 	case "user":
 		user = proto.NewUserService("user", service.Client())
@@ -119,7 +119,7 @@ func main() {
 		case "delete":
 			printResponse(user.DeleteUser(context.TODO(), &proto.UserData{Name: flag.Arg(2)}))
 		case "get":
-			printUsers(user.GetUsers(context.TODO(), &proto.UserRequest{}))
+			printUsers(user.GetUsers(context.TODO(), &proto.Request{}))
 		}
 	case "fill":
 		cine = proto.NewCinemaService("cinema", service.Client())
