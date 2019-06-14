@@ -1,10 +1,13 @@
-package main
+package user
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/client"
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
+	"math/big"
 )
 
 type User struct {
@@ -13,11 +16,10 @@ type User struct {
 }
 
 func deleteReservations(user string) {
-	service := micro.NewService(micro.Name("userRequest"))
-	service.Init()
-	reservation := proto.NewReservationService("reservation", service.Client())
+	var client client.Client
+	reservation := proto.NewReservationService("reservation", client)
 
-	rsp, err := reservation.GetReservations(context.TODO(), &proto.ReservationRequest{})
+	rsp, err := reservation.GetReservations(context.TODO(), &proto.Request{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -62,18 +64,34 @@ func (me *User) DeleteUser(ctx context.Context, req *proto.UserData, rsp *proto.
 	rsp.Message = fmt.Sprintf("Deleted User %s.", req.Name)
 	return nil
 }
-func (me *User) GetUsers(ctx context.Context, req *proto.UserRequest, rsp *proto.UserResponse) error {
+func (me *User) GetUsers(ctx context.Context, req *proto.Request, rsp *proto.UserResponse) error {
 	for k := range me.users {
 		rsp.Users = append(rsp.Users, &proto.UserData{Name: k})
 	}
 	return nil
 }
 
-func main() {
-	service := micro.NewService(micro.Name("user"))
-	service.Init()
+func StartUserService(ctx context.Context, test bool){
+	var port int64
+	port = 0
+	if test {
+		reader := rand.Reader
+		rsp, _ := rand.Int(reader, big.NewInt(1000))
+		port = 1024 + 4 + rsp.Int64()
+	}
+
+	service := micro.NewService(
+		micro.Name("user"),
+		micro.Address(fmt.Sprintf(":%v", port)),
+		micro.Context(ctx),
+	)
+
+	if !test {
+		service.Init()
+	}
 	proto.RegisterUserHandler(service.Server(), new(User))
 
+	fmt.Println("Starting user service")
 	// Run the server
 	if err := service.Run(); err != nil {
 		fmt.Println(err)

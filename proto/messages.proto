@@ -3,10 +3,8 @@ syntax = "proto3";
 service Cinema {
     rpc AddCinema(CinemaData) returns (Response) {}
     rpc DeleteCinema(CinemaData) returns (Response) {}
-    rpc GetCinemas(CinemaRequest) returns (CinemaResponse) {}
+    rpc GetCinemas(Request) returns (CinemaResponse) {}
 }
-
-message CinemaRequest {}
 
 message CinemaData {
     string name = 1;
@@ -21,10 +19,8 @@ message CinemaResponse {
 service Movie {
     rpc AddMovie(MovieData) returns (Response) {}
     rpc DeleteMovie(MovieData) returns (Response) {}
-    rpc GetMovies(MovieRequest) returns (MovieResponse) {}
+    rpc GetMovies(Request) returns (MovieResponse) {}
 }
-
-message MovieRequest {}
 
 message MovieData {
     string title = 1;
@@ -38,10 +34,8 @@ service Reservation {
     rpc RequestReservation(ReservationData) returns (Response) {}
     rpc BookReservation(ReservationData) returns (Response) {}
     rpc DeleteReservation(ReservationData) returns (Response) {}
-    rpc GetReservations(ReservationRequest) returns (ReservationResponse) {}
+    rpc GetReservations(Request) returns (ReservationResponse) {}
 }
-
-message ReservationRequest {}
 
 message ReservationData{
     int32 reservationID=1;
@@ -58,10 +52,8 @@ message ReservationResponse {
 service Showing {
     rpc AddShowing(ShowingData) returns (Response) {}
     rpc DeleteShowing(ShowingData) returns (Response) {}
-    rpc GetShowings(ShowingRequest) returns (ShowingResponse) {}
+    rpc GetShowings(Request) returns (ShowingResponse) {}
 }
-
-message ShowingRequest {}
 
 message ShowingData {
     int32 id=1;
@@ -76,10 +68,8 @@ message ShowingResponse {
 service User {
     rpc CreateUser(UserData) returns (Response) {}
     rpc DeleteUser(UserData) returns (Response) {}
-    rpc GetUsers(UserRequest) returns (UserResponse){}
+    rpc GetUsers(Request) returns (UserResponse){}
 }
-
-message UserRequest{}
 
 message UserData {
     string name = 1;
@@ -89,9 +79,9 @@ message UserResponse{
     repeated UserData users=1;
 }
 
+message Request {}
+
 message Response{
     bool success=1;
     string message=2;
 }
-
-

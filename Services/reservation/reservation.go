@@ -1,10 +1,13 @@
-package main
+package reservation
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/client"
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
+	"math/big"
 )
 
 type reservationData struct {
@@ -21,12 +24,11 @@ type Reservation struct {
 
 func getFreeSeats(reservations map[int32]*reservationData, showing int32) int32 {
 
-	service := micro.NewService(micro.Name("reservationRequest"))
-	service.Init()
-	show := proto.NewShowingService("showing", service.Client())
+	var client client.Client
+	show := proto.NewShowingService("showing",client)
 
 	// Call
-	rsp, err := show.GetShowings(context.TODO(), &proto.ShowingRequest{})
+	rsp, err := show.GetShowings(context.TODO(), &proto.Request{})
 	if err != nil {
 		fmt.Println(err)
 		return -1
@@ -40,8 +42,8 @@ func getFreeSeats(reservations map[int32]*reservationData, showing int32) int32 
 		}
 	}
 
-	cine := proto.NewCinemaService("cinema", service.Client())
-	resp, err := cine.GetCinemas(context.TODO(), &proto.CinemaRequest{})
+	cine := proto.NewCinemaService("cinema", client)
+	resp, err := cine.GetCinemas(context.TODO(), &proto.Request{})
 	if err != nil {
 		fmt.Println(err)
 		return -1
@@ -63,12 +65,11 @@ func getFreeSeats(reservations map[int32]*reservationData, showing int32) int32 
 }
 
 func showingExists(showing int32) bool {
-	service := micro.NewService(micro.Name("reservationRequest"))
-	service.Init()
-	show := proto.NewShowingService("showing", service.Client())
+	var client client.Client
+	show := proto.NewShowingService("showing", client)
 
 	// Call
-	rsp, err := show.GetShowings(context.TODO(), &proto.ShowingRequest{})
+	rsp, err := show.GetShowings(context.TODO(), &proto.Request{})
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -83,12 +84,11 @@ func showingExists(showing int32) bool {
 }
 
 func userExists(name string) bool {
-	service := micro.NewService(micro.Name("reservationRequest"))
-	service.Init()
-	user := proto.NewUserService("user", service.Client())
+	var client client.Client
+	user := proto.NewUserService("user", client)
 
 	// Call
-	rsp, err := user.GetUsers(context.TODO(), &proto.UserRequest{})
+	rsp, err := user.GetUsers(context.TODO(), &proto.Request{})
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -135,6 +135,11 @@ func (me *Reservation) BookReservation(ctx context.Context, req *proto.Reservati
 		rsp.Message = fmt.Sprintf("Reservation ID %d does not exist.", req.ReservationID)
 		return nil
 	}
+	if me.reservations[req.ReservationID].booked {
+		rsp.Success = false
+		rsp.Message = fmt.Sprintf("Reservation %d already booked", req.ReservationID)
+		return nil
+	}
 
 	if getFreeSeats(me.reservations, me.reservations[req.ReservationID].showing) < me.reservations[req.ReservationID].seats {
 		rsp.Success = false
@@ -161,18 +166,34 @@ func (me *Reservation) DeleteReservation(ctx context.Context, req *proto.Reserva
 
 	return nil
 }
-func (me *Reservation) GetReservations(ctx context.Context, req *proto.ReservationRequest, rsp *proto.ReservationResponse) error {
+func (me *Reservation) GetReservations(ctx context.Context, req *proto.Request, rsp *proto.ReservationResponse) error {
 	for k, v := range me.reservations {
 		rsp.Data = append(rsp.Data, &proto.ReservationData{ReservationID: k, Seats: v.seats, Showing: v.showing, Booked: v.booked, User: v.user})
 	}
 	return nil
 }
 
-func main() {
-	service := micro.NewService(micro.Name("reservation"))
-	service.Init()
+func StartReservationService(ctx context.Context, test bool){
+	var port int64
+	port = 0
+	if test {
+		reader := rand.Reader
+		rsp, _ := rand.Int(reader, big.NewInt(1000))
+		port = 1024 + 4 + rsp.Int64()
+	}
+
+	service := micro.NewService(
+		micro.Name("reservation"),
+		micro.Address(fmt.Sprintf(":%v", port)),
+		micro.Context(ctx),
+	)
+
+	if !test {
+		service.Init()
+	}
 	proto.RegisterReservationHandler(service.Server(), new(Reservation))
 
+	fmt.Println("Starting reservation service")
 	// Run the server
 	if err := service.Run(); err != nil {
 		fmt.Println(err)

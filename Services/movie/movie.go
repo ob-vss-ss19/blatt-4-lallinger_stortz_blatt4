@@ -1,10 +1,13 @@
-package main
+package movie
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/client"
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
+	"math/big"
 )
 
 type Movie struct {
@@ -13,11 +16,10 @@ type Movie struct {
 }
 
 func deleteShowings(movie string) {
-	service := micro.NewService(micro.Name("movieRequest"))
-	service.Init()
-	show := proto.NewShowingService("showing", service.Client())
+	var client client.Client
+	show := proto.NewShowingService("showing", client)
 
-	rsp, err := show.GetShowings(context.TODO(), &proto.ShowingRequest{})
+	rsp, err := show.GetShowings(context.TODO(), &proto.Request{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -62,20 +64,38 @@ func (me *Movie) DeleteMovie(ctx context.Context, req *proto.MovieData, rsp *pro
 	rsp.Message = fmt.Sprintf("Deleted %s from movies.", req.Title)
 	return nil
 }
-func (me *Movie) GetMovies(ctx context.Context, req *proto.MovieRequest, rsp *proto.MovieResponse) error {
+func (me *Movie) GetMovies(ctx context.Context, req *proto.Request, rsp *proto.MovieResponse) error {
 	for k := range me.movies {
 		rsp.Data = append(rsp.Data, &proto.MovieData{Title: k})
 	}
 	return nil
 }
 
-func main() {
-	service := micro.NewService(micro.Name("movie"))
-	service.Init()
+func StartMovieService(ctx context.Context, test bool){
+	var port int64
+	port = 0
+	if test {
+		reader := rand.Reader
+		rsp, _ := rand.Int(reader, big.NewInt(1000))
+		port = 1024 + 4 + rsp.Int64()
+	}
+
+	service := micro.NewService(
+		micro.Name("movie"),
+		micro.Address(fmt.Sprintf(":%v", port)),
+		micro.Context(ctx),
+	)
+
+	if !test {
+		service.Init()
+	}
 	proto.RegisterMovieHandler(service.Server(), new(Movie))
 
+	fmt.Println("Starting movie service")
 	// Run the server
 	if err := service.Run(); err != nil {
 		fmt.Println(err)
 	}
 }
+
+
