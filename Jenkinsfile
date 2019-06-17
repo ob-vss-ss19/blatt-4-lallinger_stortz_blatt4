@@ -37,6 +37,8 @@ pipeline {
             agent any
             steps {
                 sh "echo build docker"
+                sh "docker-build-and-push -b ${BRANCH_NAME} -s client -f client.dockerfile"
+                sh "docker-build-and-push -b ${BRANCH_NAME} -s services -f services.dockerfile"
             }
         }
     }
