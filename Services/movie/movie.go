@@ -71,9 +71,9 @@ func (me *Movie) GetMovies(ctx context.Context, req *proto.Request, rsp *proto.M
 	return nil
 }
 
-func StartMovieService(ctx context.Context, test bool){
+func StartMovieService(ctx context.Context, test bool) {
 	var port int64
-	port = 0
+	port = 8093
 	if test {
 		reader := rand.Reader
 		rsp, _ := rand.Int(reader, big.NewInt(1000))
@@ -97,5 +97,3 @@ func StartMovieService(ctx context.Context, test bool){
 		fmt.Println(err)
 	}
 }
-
-

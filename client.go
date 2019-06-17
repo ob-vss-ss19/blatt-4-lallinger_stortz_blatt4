@@ -66,7 +66,7 @@ func main() {
 	}
 
 	service := micro.NewService(micro.Name("client"))
-	service.Init()
+	service.Init(micro.Address(fmt.Sprintf(":%v", 8091)))
 
 	switch flag.Arg(0) {
 	case "cinema":

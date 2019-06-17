@@ -19,7 +19,7 @@ pipeline {
                 sh 'echo run tests...'
                 sh 'cd Services/cinemahall && go test'
                 sh 'cd Services/movie && go test'
-                sh 'cd Services/reseration && go test'
+                sh 'cd Services/reservation && go test'
                 sh 'cd Services/showing && go test'
                 sh 'cd Services/user && go test'
             }

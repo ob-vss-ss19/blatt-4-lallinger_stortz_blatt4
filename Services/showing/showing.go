@@ -121,9 +121,9 @@ func (me *Showing) GetShowings(ctx context.Context, req *proto.Request, rsp *pro
 	return nil
 }
 
-func StartShowingService(ctx context.Context, test bool){
+func StartShowingService(ctx context.Context, test bool) {
 	var port int64
-	port = 0
+	port = 8095
 	if test {
 		reader := rand.Reader
 		rsp, _ := rand.Int(reader, big.NewInt(1000))
