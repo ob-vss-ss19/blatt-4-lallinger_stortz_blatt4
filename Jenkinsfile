@@ -7,6 +7,8 @@ pipeline {
             }
             steps {
                 sh 'echo build'
+                sh 'go build -o client.exe'
+                sh 'cd Services && go build -o services.exe'
             }
         }
         stage('Test') {
@@ -15,6 +17,11 @@ pipeline {
             }
             steps {
                 sh 'echo run tests...'
+                sh 'cd Services/cinemahall && go test'
+                sh 'cd Services/movie && go test'
+                sh 'cd Services/reseration && go test'
+                sh 'cd Services/showing && go test'
+                sh 'cd Services/user && go test'
             }
         }
         stage('Lint') {
