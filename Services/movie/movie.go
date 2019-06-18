@@ -2,12 +2,10 @@ package movie
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/client"
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
-	"math/big"
 )
 
 type Movie struct {
@@ -71,14 +69,14 @@ func (me *Movie) GetMovies(ctx context.Context, req *proto.Request, rsp *proto.M
 	return nil
 }
 
-func StartMovieService(ctx context.Context, test bool){
+func StartMovieService(ctx context.Context, test bool) {
 	var port int64
-	port = 0
-	if test {
-		reader := rand.Reader
-		rsp, _ := rand.Int(reader, big.NewInt(1000))
-		port = 1024 + 4 + rsp.Int64()
-	}
+	port = 8093
+	//if test {
+	//	reader := rand.Reader
+	//	rsp, _ := rand.Int(reader, big.NewInt(1000))
+	//	port = 1024 + 4 + rsp.Int64()
+	//}
 
 	service := micro.NewService(
 		micro.Name("movie"),
@@ -97,5 +95,3 @@ func StartMovieService(ctx context.Context, test bool){
 		fmt.Println(err)
 	}
 }
-
-

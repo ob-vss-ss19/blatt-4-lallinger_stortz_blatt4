@@ -2,12 +2,10 @@ package user
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/client"
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
-	"math/big"
 )
 
 type User struct {
@@ -71,14 +69,14 @@ func (me *User) GetUsers(ctx context.Context, req *proto.Request, rsp *proto.Use
 	return nil
 }
 
-func StartUserService(ctx context.Context, test bool){
+func StartUserService(ctx context.Context, test bool) {
 	var port int64
-	port = 0
-	if test {
-		reader := rand.Reader
-		rsp, _ := rand.Int(reader, big.NewInt(1000))
-		port = 1024 + 4 + rsp.Int64()
-	}
+	port = 8096
+	//if test {
+	//	reader := rand.Reader
+	//	rsp, _ := rand.Int(reader, big.NewInt(1000))
+	//	port = 1024 + 4 + rsp.Int64()
+	//}
 
 	service := micro.NewService(
 		micro.Name("user"),

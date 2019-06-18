@@ -2,12 +2,10 @@ package reservation
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/client"
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
-	"math/big"
 )
 
 type reservationData struct {
@@ -25,7 +23,7 @@ type Reservation struct {
 func getFreeSeats(reservations map[int32]*reservationData, showing int32) int32 {
 
 	var client client.Client
-	show := proto.NewShowingService("showing",client)
+	show := proto.NewShowingService("showing", client)
 
 	// Call
 	rsp, err := show.GetShowings(context.TODO(), &proto.Request{})
@@ -173,14 +171,14 @@ func (me *Reservation) GetReservations(ctx context.Context, req *proto.Request, 
 	return nil
 }
 
-func StartReservationService(ctx context.Context, test bool){
+func StartReservationService(ctx context.Context, test bool) {
 	var port int64
-	port = 0
-	if test {
-		reader := rand.Reader
-		rsp, _ := rand.Int(reader, big.NewInt(1000))
-		port = 1024 + 4 + rsp.Int64()
-	}
+	port = 8094
+	//if test {
+	//	reader := rand.Reader
+	//	rsp, _ := rand.Int(reader, big.NewInt(1000))
+	//	port = 1024 + 4 + rsp.Int64()
+	//}
 
 	service := micro.NewService(
 		micro.Name("reservation"),
