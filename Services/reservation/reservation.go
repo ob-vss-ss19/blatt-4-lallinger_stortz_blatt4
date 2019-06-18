@@ -3,6 +3,7 @@ package reservation
 import (
 	"context"
 	"fmt"
+	"sync"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/client"
 	proto "github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4/proto"
@@ -18,6 +19,7 @@ type reservationData struct {
 type Reservation struct {
 	reservations map[int32]*reservationData
 	nextID       int32
+	mux          sync.RWMutex
 }
 
 func getFreeSeats(reservations map[int32]*reservationData, showing int32) int32 {
@@ -128,6 +130,9 @@ func (me *Reservation) RequestReservation(ctx context.Context, req *proto.Reserv
 	return nil
 }
 func (me *Reservation) BookReservation(ctx context.Context, req *proto.ReservationData, rsp *proto.Response) error {
+	me.mux.Lock()
+	defer me.mux.Unlock()
+	
 	if _, ok := me.reservations[req.ReservationID]; !ok {
 		rsp.Success = false
 		rsp.Message = fmt.Sprintf("Reservation ID %d does not exist.", req.ReservationID)
