@@ -1,60 +1,112 @@
+# Prototypische Implementierung eines Reservierungssystems für ein Kino (Blatt 4 Verteilte Softwaresysteme)
+
+## Was macht dieses Tool?
+Es werden hier 2 Binaries zur Verfügung gestellt, zum einen services.exe, hier werden Go Micro Services für die Kinosäle, die Filme, die Reservierungen, Aufführungen und die User gestartet,
+zum anderen eine client.exe mit der Anfragen an die Services gestellt werden können, wie zum Beispiel hinzufügen eines Films, buchen einer Aufführung etc.. 
+
+## Getting started
+
+-   Zunächst das Github Repository klonen:
+
+    ```
+    git clone https://github.com/ob-vss-ss19/blatt-4-lallinger_stortz_blatt4.git blatt4
+    ```
+
+-   Wechseln in das Verzeichnis:
+
+    ```
+    cd blatt4
+    ```
+
+-   Anschließend bauen der Services mit:
+
+    ```
+    go build -o services.exe Services/main.go
+    ```
+
+-   Bauen des Clients:
+
+    ```
+    go build -o client.exe
+    ```
+
+-   Starten der Services:
+
+    ```
+    ./Services/services.exe
+    ```
+    
+-   Starten des Clients:
+
+    ```
+    client.exe fill
+    ```
+    
+Für eine Liste an Befehlen siehe weiter unten Usage.
+
 ## Ausführen mit Docker
 
--   Images bauen
+-   Images bauen:
 
     ```
-    make docker
+    docker build -f services.dockerfile -t services ./
+    docker build -f client.dockerfile -t client ./
     ```
 
--   ein (Docker)-Netzwerk `actors` erzeugen
+-   ein (Docker)-Netzwerk `testnet` erzeugen:
 
     ```
-    docker network create actors
+    docker network create testnet
     ```
 
--   Starten des Tree-Services und binden an den Port 8090 des Containers mit dem DNS-Namen
-    `treeservice` (entspricht dem Argument von `--name`) im Netzwerk `actors`:
+-   Starten der Services (Ports 8092-8096 müssen frei sein) im Netzwerk `testnet`:
 
     ```
-    docker run --rm --net actors --name treeservice treeservice \
-      --bind="treeservice.actors:8090"
+    docker run --rm --net testnet server
     ```
 
-    Damit das funktioniert, müssen Sie folgendes erst im Tree-Service implementieren:
-
-    -   die `main` verarbeitet Kommandozeilenflags und
-    -   der Remote-Actor nutzt den Wert des Flags
-    -   wenn Sie einen anderen Port als `8090` benutzen wollen,
-        müssen Sie das auch im Dockerfile ändern (`EXPOSE...`)
-
--   Starten des Tree-CLI, Binden an `treecli.actors:8091` und nutzen des Services unter
-    dem Namen und Port `treeservice.actors:8090`:
+-   Starten des Clients (Port 8091 muss frei sein. Für Optionen siehe Usage weiter unten):
 
     ```
-    docker run --rm --net actors --name treecli treecli --bind="treecli.actors:8091" \
-      --remote="treeservice.actors:8090" trees
+    docker run --rm --net testnet client fill
     ```
 
-    Hier sind wieder die beiden Flags `--bind` und `--remote` beliebig gewählt und
-    in der Datei `treeservice/main.go` implementiert. `trees` ist ein weiteres
-    Kommandozeilenargument, dass z.B. eine Liste aller Tree-Ids anzeigen soll.
+## Usage
 
-    Zum Ausprobieren können Sie den Service dann laufen lassen. Das CLI soll ja jedes
-    Mal nur einen Befehl abarbeiten und wird dann neu gestartet.
-
--   Zum Beenden, killen Sie einfach den Tree-Service-Container mit `Ctrl-C` und löschen
-    Sie das Netzwerk mit
+-   Über den Client können jedem Service (cinema, movie, reservation, showing und user) Daten hinzugefügt (add), gelöscht (delete) und aufgelistet (get) werden.
+Einzige Ausnahme bietet hierbei reservation, hier ist es nicht möglich einfach eine Reservierung hinzuzufügen, diese muss zunächst beantragt (request) werden und anschließend gebucht (book).
 
     ```
-    docker network rm actors
-    ```
-
-## Ausführen mit Docker ohne vorher die Docker-Images zu bauen
-
-Nach einem Commit baut der Jenkins, wenn alles durch gelaufen ist, die beiden
-Docker-Images. Sie können diese dann mit `docker pull` herunter laden. Schauen Sie für die
-genaue Bezeichnung in die Consolenausgabe des Jenkins-Jobs.
-
-Wenn Sie die Imagenamen oben (`treeservice` und `treecli`) durch die Namen aus der
-Registry ersetzen, können Sie Ihre Lösung mit den selben Kommandos wie oben beschrieben,
-ausprobieren.
+    client.exe SERVICE FUNCTION PARAMS
+    SERVICE
+     cinema
+      FUNCTION
+      -add PARAMS: name. Example: client.exe cinema add hall1
+      -delete PARAMS: name. Example: client.exe cinema delete hall1
+      -get: Example: client.exe cinema get
+     movie
+      FUNCTION
+      -add PARAMS: title. Example: client.exe movie add shrek
+      -delete PARAMS: title. Example: client.exe movie delete shrek
+      -get: Example: client.exe movie get
+     reservation
+      FUNCTION
+      -request PARAMS: user showingID seats. Example: client.exe reservation request sepp 2 4
+       Requests a reservation.
+      -book PARAMS: reservationID. Example: client.exe reservation book 1
+       Books a reservation.
+      -delete PARAMS: reservationID. Example: client.exe reservation delete 1
+      -get: Example: client.exe reservation get
+     showing
+      FUNCTION
+      -add PARAMS: movie cinema. Example: client.exe showing add shrek hall1
+      -delete PARAMS: showingID. Example: client.exe showing delete 4
+      -get: Example: client.exe showing get
+     user
+      FUNCTION
+      -add PARAMS: name. Example: client.exe user add sepp
+      -delete PARAMS: name. Example: client.exe user delete sepp
+      -get: Example: client.exe user get
+     fill
+      -Fills services with some data. Example: client.exe fill
+      ```
